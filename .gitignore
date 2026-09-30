@@ -1,0 +1,13 @@
+# Raw dataset (download from https://zenodo.org/records/8253611)
+HawaiiCoast_GT/
+
+# Generated data
+clean_data/
+features/
+.tmp/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
