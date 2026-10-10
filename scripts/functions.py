@@ -14,3 +14,18 @@ def haversine() -> str:
                 + cos(radians(lat1)) * cos(radians(lat2)) * power(sin(radians(lon2 - lon1) / 2), 2) 
             ))
     """
+
+
+def bearing() -> str:
+    """Creat bearing function in SQL: compass direction (0 = north) from point 1 to point 2"""
+    return """
+        CREATE MACRO bearing(lat1, lon1, lat2, lon2) AS
+            (degrees(atan2((lon2 - lon1) * cos(radians(lat1)), lat2 - lat1)) + 360) % 360
+    """
+
+
+def angle_diff() -> str:
+    """Create angle_diff function in SQL: smallest difference between two angles (0-180)"""
+    return """
+        CREATE MACRO angle_diff(x, y) AS 180 - abs(abs(x - y) % 360 - 180)
+    """
