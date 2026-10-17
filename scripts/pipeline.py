@@ -2,16 +2,18 @@
 
 import data_cleaning
 import pair_feature
+import rules_paired
 import time_grid
 import window_feature
 
 RUN_CHECK = True
-YEARS = [2017, 2018]
+YEARS = [2017, 2018, 2019, 2020]
 STEPS = [
     # data_cleaning, # slow
     time_grid,
     pair_feature,
     window_feature,
+    rules_paired,
 ]
 
 

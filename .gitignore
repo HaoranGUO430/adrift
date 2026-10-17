@@ -4,6 +4,7 @@ HawaiiCoast_GT/
 # Generated data
 clean_data/
 features/
+results/
 .tmp/
 
 # Python
