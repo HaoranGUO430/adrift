@@ -6,7 +6,7 @@ import rules_paired
 import time_grid
 import window_feature
 
-RUN_CHECK = True
+RUN_CHECK = False
 YEARS = [2017, 2018, 2019, 2020]
 STEPS = [
     # data_cleaning, # slow

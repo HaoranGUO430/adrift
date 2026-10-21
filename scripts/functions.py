@@ -29,3 +29,21 @@ def angle_diff() -> str:
     return """
         CREATE MACRO angle_diff(x, y) AS 180 - abs(abs(x - y) % 360 - 180)
     """
+
+
+def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
+    """Wilson confidence interval of a proportion k/n.
+
+    Args:
+        k: Number of successes.
+        n: Number of trials.
+        z: z-score of the confidence level.
+
+    Returns:
+        Lower and upper bound of the interval.
+    """
+    p = k / n
+    d = 1 + z * z / n
+    centre = (p + z * z / (2 * n)) / d
+    half = z * (p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5 / d
+    return centre - half, centre + half

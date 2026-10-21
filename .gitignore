@@ -5,6 +5,7 @@ HawaiiCoast_GT/
 clean_data/
 features/
 results/
+ground_truth/
 .tmp/
 
 # Python
