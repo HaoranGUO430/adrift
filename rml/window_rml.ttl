@@ -1,0 +1,51 @@
+@prefix rr:  <http://www.w3.org/ns/r2rml#> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ad:  <https://github.com/HaoranGUO430/adrift#> .
+
+<#PairWindow> a rr:TriplesMap ;
+    rml:logicalSource [
+        rml:source "{windows}"
+    ] ;
+
+    rr:subjectMap [
+        rr:template "https://github.com/HaoranGUO430/adrift#w{mmsi_a}_{mmsi_b}_{window_min}_{window_end}" ;
+        rr:class ad:PairWindow
+    ] ;
+    
+    rr:predicateObjectMap [
+        rr:predicate ad:pairA ;
+        rr:objectMap [ rr:template "https://github.com/HaoranGUO430/adrift#v{mmsi_a}" ]
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate ad:pairB ;
+        rr:objectMap [ rr:template "https://github.com/HaoranGUO430/adrift#v{mmsi_b}" ]
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate ad:windowMin ;
+        rr:objectMap [ rml:reference "window_min" ; rr:datatype xsd:integer ]
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate ad:windowEnd ;
+        rr:objectMap [ rml:reference "window_end" ; rr:datatype xsd:integer ]
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate ad:coverage ;
+        rr:objectMap [ rml:reference "coverage" ; rr:datatype xsd:double ]
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate ad:sdDistance ;
+        rr:objectMap [ rml:reference "sd_distance_m" ; rr:datatype xsd:double ]
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate ad:meanDistance ;
+        rr:objectMap [ rml:reference "mean_distance_m" ; rr:datatype xsd:double ]
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate ad:fracAAstern ;
+        rr:objectMap [ rml:reference "frac_a_astern_of_b" ; rr:datatype xsd:double ]
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate ad:fracBAstern ;
+        rr:objectMap [ rml:reference "frac_b_astern_of_a" ; rr:datatype xsd:double ]
+    ] .

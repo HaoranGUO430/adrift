@@ -1,0 +1,129 @@
+@prefix ad:   <https://github.com/HaoranGUO430/adrift#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Vessel's property
+
+ad:Vessel a rdfs:Class ;
+    rdfs:label "Vessel" ;
+    rdfs:comment "Anything broadcasts AIS messages under a MMSI." .
+
+ad:Ship a rdfs:Class ;
+    rdfs:subClassOf ad:Vessel ;
+    rdfs:comment "A vessel whose MMSI starts between 2 & 7." .
+
+ad:SelfPropelledVessel a rdfs:Class ;
+    rdfs:subClassOf ad:Vessel ;
+    rdfs:comment "A ship that normally sails on its own; being towed is irregular." .
+
+ad:FishingVessel a rdfs:Class ;
+    rdfs:subClassOf ad:SelfPropelledVessel ;
+    ad:registryLabel "Fishing" .
+
+ad:PleasureCraft a rdfs:Class ;
+    rdfs:subClassOf ad:SelfPropelledVessel ;
+    ad:registryLabel "Pleasure Craft/Sailing" .
+
+ad:IndustrialVessel a rdfs:Class ;
+    rdfs:subClassOf ad:SelfPropelledVessel ;
+    ad:registryLabel "Industrial Vessel" .
+
+ad:mmsi a rdf:Property ;
+    rdfs:domain ad:Vessel ;
+    rdfs:comment "Maritime Mobile Service Identity." .
+
+ad:name a rdf:Property ;
+    rdfs:domain ad:Vessel .
+
+ad:registeredClass a rdf:Property ;
+    rdfs:domain ad:Vessel ;
+    rdfs:comment "Vessel class from the AIS registry, as text (e.g. Fishing, Cargo, Unknown)." .
+
+#  Paired Vessels' window
+
+ad:PairWindow a rdfs:Class ;
+    rdfs:comment "A sliding window over two paired vessels." .
+
+ad:pairA a rdf:Property ; 
+    rdfs:domain ad:PairWindow ; 
+    rdfs:range ad:Vessel .
+
+ad:pairB a rdf:Property ; 
+    rdfs:domain ad:PairWindow ; 
+    rdfs:range ad:Vessel .
+
+ad:windowMin a rdf:Property ; 
+    rdfs:domain ad:PairWindow ; 
+    rdfs:comment "Window length in minutes(5, 15, 30 or 60)." .
+
+ad:windowEnd a rdf:Property ; 
+    rdfs:domain ad:PairWindow ; 
+    rdfs:comment "Last minute of the window." .
+
+ad:coverage a rdf:Property ; 
+    rdfs:domain ad:PairWindow ; 
+    rdfs:comment "Proportion of the window minutes with data for both vessels." .
+
+ad:sdDistance a rdf:Property ; 
+    rdfs:domain ad:PairWindow ; 
+    rdfs:comment "Standard deviation of the distance between two vessels(m)." .
+
+ad:meanDistance a rdf:Property ; 
+    rdfs:domain ad:PairWindow ; 
+    rdfs:comment "Average distance between two vessels(m)." .
+
+ad:fracAAstern a rdf:Property ; 
+    rdfs:domain ad:PairWindow ; 
+    rdfs:comment "Proportion of minutes with vessel A within 45 degrees astern of vessel B." .
+    
+ad:fracBAstern a rdf:Property ; 
+    rdfs:domain ad:PairWindow ; 
+    rdfs:comment "Proportion of minutes with vessel B within 45 degrees astern of vessel A." .
+
+# Rules
+
+ad:TowWindow a rdfs:Class ;
+    rdfs:subClassOf ad:PairWindow ;
+    rdfs:comment "A pair window that satisfies the physical conditions of a towline." .
+
+ad:IrregularTowWindow a rdfs:Class ;
+    rdfs:subClassOf ad:TowWindow ;
+    rdfs:comment "A tow window whose towed vessel normally sails on its own." .
+
+ad:towed a rdf:Property ; 
+    rdfs:domain ad:TowWindow ; 
+    rdfs:range ad:Vessel .
+
+ad:tower a rdf:Property ; 
+    rdfs:domain ad:TowWindow ; 
+    rdfs:range ad:Vessel .
+
+ad:towedBy a rdf:Property ; 
+    rdfs:domain ad:Vessel ; 
+    rdfs:range ad:Vessel .
+
+ad:alertLevel a rdf:Property ; 
+    rdfs:domain ad:TowWindow ; 
+    rdfs:range ad:AlertLevel .
+
+ad:AlertLevel a rdfs:Class .
+
+ad:Low a ad:AlertLevel ;
+    ad:levelWindowMin 15 ;
+    rdfs:comment "Low level alert with 15-minute window satisfies the tow conditions." .
+
+ad:Mid a ad:AlertLevel ;
+    ad:levelWindowMin 30 ;
+    rdfs:comment "Mid level alert with 30-minute window satisfies the tow conditions." .
+
+ad:High a ad:AlertLevel ;
+    ad:levelWindowMin 60 ;
+    rdfs:comment "High level alert with 60-minute window satisfies the tow conditions." .
+
+ad:registryLabel a rdf:Property ;
+    rdfs:domain rdfs:Class ;
+    rdfs:comment "The text the AIS registry uses for this class." .
+
+ad:levelWindowMin a rdf:Property ;
+    rdfs:domain ad:AlertLevel ;
+    rdfs:comment "Window length in minutes that gives this alert level." .

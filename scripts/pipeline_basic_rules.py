@@ -1,19 +1,24 @@
 """Pipeline"""
 
 import data_cleaning
+import evaluation
 import pair_feature
 import rules_paired
 import time_grid
 import window_feature
 
+import ground_truth
+
 RUN_CHECK = False
 YEARS = [2017, 2018, 2019, 2020]
 STEPS = [
-    # data_cleaning, # slow
+    data_cleaning,  # slow
     time_grid,
     pair_feature,
     window_feature,
     rules_paired,
+    ground_truth,
+    evaluation,
 ]
 
 

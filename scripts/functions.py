@@ -1,5 +1,11 @@
 """Common functions here"""
 
+PREFIXES = {
+    "ad:": "https://github.com/HaoranGUO430/adrift#",
+    "rdf:": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs:": "http://www.w3.org/2000/01/rdf-schema#",
+}
+
 
 def haversine() -> str:
     """Creat haversine distance function in SQL"""
@@ -47,3 +53,33 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
     centre = (p + z * z / (2 * n)) / d
     half = z * (p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5 / d
     return centre - half, centre + half
+
+
+def expand(name: str) -> str:
+    """Expand a prefixed name into a full IRI.
+
+    Args:
+        name: Prefixed name, e.g. "ad:Ship".
+
+    Returns:
+        Full IRI, e.g. "https://github.com/HaoranGUO430/adrift#Ship".
+    """
+    for prefix, iri in PREFIXES.items():
+        if name.startswith(prefix):
+            return iri + name[len(prefix) :]
+    return name
+
+
+def shorten(iri: str) -> str:
+    """Shorten a full IRI into a prefixed name.
+
+    Args:
+        iri: Full IRI, e.g. "https://github.com/HaoranGUO430/adrift#Ship".
+
+    Returns:
+        Prefixed name, e.g. "ad:Ship".
+    """
+    for prefix, base in PREFIXES.items():
+        if iri.startswith(base):
+            return prefix + iri[len(base) :]
+    return iri
