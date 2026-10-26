@@ -4,7 +4,7 @@ import shutil
 from pathlib import Path
 
 import duckdb
-from functions import haversine
+from functions import haversine, valid
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DATA = ROOT / "HawaiiCoast_GT"
@@ -18,7 +18,6 @@ RUN_CHECK = True
 YEARS = [2017, 2018, 2019, 2020]
 SPIKE_MIN_DIST_M = 1000  # spike > 1 km away on both sides
 SPIKE_MIN_SPEED_KN = 50  # spike speed > 50 kn on both sides
-SEGMENT_GAP_SEC = 30 * 60  # > 30 min -> a new segment
 MS_TO_KN = 1.943844  # 1 m/s = 1.943844 knots
 TOW_TYPES = "Irregular tow|Helper tow"
 VALID_INTERVAL = {
@@ -41,12 +40,6 @@ AIS_TYPES = {
 }
 
 
-def valid(col: str, val: str) -> str:
-    """SQL : keep val if it is inside the valid interval of col, else NULL."""
-    low, high = VALID_INTERVAL[col]
-    return f"CASE WHEN {val} BETWEEN {low} AND {high} THEN {val} END AS {col}"
-
-
 def main() -> None:
     con = duckdb.connect()
     con.execute("SET TimeZone = 'UTC'")
@@ -61,12 +54,12 @@ def main() -> None:
     con.execute(f"""
         CREATE TABLE stage AS
         SELECT
-            MMSI            AS mmsi,
-            datetime_utc    AS t,
+            MMSI AS mmsi,
+            datetime_utc AS t,
             lat,
             lon,
-            {valid("sog", "speed_over_ground_knots")},
-            {valid("cog", "course_over_ground_deg")},
+            {valid("sog", "speed_over_ground_knots", VALID_INTERVAL["sog"])},
+            {valid("cog", "course_over_ground_deg", VALID_INTERVAL["cog"])},
             incident_num
         FROM read_csv('{glob}', header = true, types = {AIS_TYPES})
         WHERE lat BETWEEN {BBOX["lat"][0]} AND {BBOX["lat"][1]}
@@ -124,32 +117,14 @@ def main() -> None:
     # Save memories
     con.execute("DROP TABLE stage")
 
-    # Delete position spikes and find segments of time WITH gaps
-    # ROWS UNBOUNDED PRECEDING: sum until current row
-    con.execute(f"""
+    # Delete position spikes
+    con.execute("""
         CREATE TABLE points AS
-        WITH gaps AS (
-            SELECT 
-                *,
-                epoch(t) - epoch(lag(t) OVER (PARTITION BY mmsi ORDER BY t)) AS gap_s
-            FROM flagged
-            WHERE NOT is_spike
-        )
         SELECT
-            mmsi, t, lat, lon,
-            sog AS sog,
-            cog AS cog,
-            sum(
-                CASE WHEN 
-                    gap_s IS NULL 
-                        OR gap_s > {SEGMENT_GAP_SEC} 
-                    THEN 1 
-                    ELSE 0 
-                END
-                )
-                OVER (PARTITION BY mmsi ORDER BY t ROWS UNBOUNDED PRECEDING)::INTEGER AS seg_id,
+            mmsi, t, lat, lon, sog, cog,
             incident_num::SMALLINT AS incident_num
-        FROM gaps
+        FROM flagged
+        WHERE NOT is_spike
     """)
 
     if RUN_CHECK:
@@ -158,7 +133,6 @@ def main() -> None:
                 (SELECT count(*) FROM flagged) AS after_dedup,
                 (SELECT count(*) FROM flagged WHERE is_spike) AS spikes,
                 (SELECT count(*) FROM points) AS clean_points,
-                (SELECT count(DISTINCT (mmsi, seg_id)) FROM points) AS segments,
                 (SELECT count(incident_num) FROM points) AS labeled_points
         """).show()
 
@@ -181,7 +155,7 @@ def main() -> None:
                 END AS vessel_class
             FROM read_csv('{vessels_csv}')
         )
-        SELECT *, vessel_class = 'Tug Tow' AS is_tug
+        SELECT *
         FROM v
         ORDER BY mmsi
     """)
@@ -253,7 +227,7 @@ def main() -> None:
             ORDER BY year
         """).show()
         con.sql("""
-            SELECT count(*) AS vessels, count(*) FILTER (WHERE is_tug) AS tugs,
+            SELECT count(*) AS vessels,
                    count(*) FILTER (WHERE vessel_class = 'Unknown') AS unknown_class
             FROM vessels
         """).show()

@@ -1,4 +1,9 @@
 duckdb==1.5.5
-pandas==3.0.6
-matplotlib==3.11.2
+pandas==2.3.3
+numpy==2.4.6
+rdflib==7.2.1
+morph-kgc==2.10.0
 ipykernel==7.3.0
+# kolibrie-python is not on PyPI: build it from source with maturin (needs Rust)
+#   git clone https://github.com/StreamIntelligenceLab/Kolibrie.git
+#   cd Kolibrie/python && maturin develop --release

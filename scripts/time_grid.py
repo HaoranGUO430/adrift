@@ -10,7 +10,7 @@ POINTS_DIR = ROOT / "clean_data" / "points"
 MINUTE_DIR = ROOT / "features" / "minute"
 
 RUN_CHECK = True
-YEARS = [2017, 2018]  # development
+YEARS = [2017, 2018, 2019, 2020]
 MIN_SOG_KN = 1.0  # if vessels moving
 MAX_GAP_MIN = 10  # if break < 10 min, interpolation
 MAX_SPEED_MISMATCH_KN = 5  # additional speed limit
@@ -40,7 +40,7 @@ def main() -> None:
             COPY (
                 WITH pairs AS (
                     SELECT
-                        mmsi, seg_id,
+                        mmsi,
                         t AS t0,
                         lat AS lat0,
                         lon AS lon0,
@@ -52,7 +52,7 @@ def main() -> None:
                         lead(sog) OVER w AS sog1,
                         lead(cog) OVER w AS cog1
                     FROM read_parquet('{src}')
-                    WINDOW w AS (PARTITION BY mmsi, seg_id ORDER BY t)
+                    WINDOW w AS (PARTITION BY mmsi ORDER BY t)
                 ),
                 usable AS (
                     SELECT *
@@ -101,7 +101,6 @@ def main() -> None:
                         WHEN cog_raw >= 360 THEN cog_raw - 360
                         ELSE cog_raw
                     END AS cog,
-                    seg_id,
                     (epoch(t1) - epoch(t0)) AS gap_s
                 FROM interpolated
                 ORDER BY minute, mmsi

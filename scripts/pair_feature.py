@@ -10,7 +10,7 @@ MINUTE_DIR = ROOT / "features" / "minute"
 PAIR_DIR = ROOT / "features" / "pair"
 
 RUN_CHECK = True
-YEARS = [2017, 2018]
+YEARS = [2017, 2018, 2019, 2020]
 CANDIDATE_MAX_M = 2000  # threshold for distanse of 2 vessels chosen by data and fact
 
 

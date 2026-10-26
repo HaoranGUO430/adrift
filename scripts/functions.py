@@ -7,6 +7,25 @@ PREFIXES = {
 }
 
 
+def valid(col: str, val: str, interval: tuple[float, float]) -> str:
+    """SQL that keeps a value only inside its valid interval.
+
+    Args:
+        col: Output column name, e.g. "sog".
+        val: Input column, e.g. "speed_over_ground_knots".
+        interval: Lowest and highest valid value.
+
+    Returns:
+        SQL expression.
+    """
+    low, high = interval
+    return f"""
+        CASE WHEN {val} BETWEEN {low} AND {high} 
+            THEN {val} 
+        END AS {col}
+    """
+
+
 def haversine() -> str:
     """Creat haversine distance function in SQL"""
     # Calculate distance by haversine function, better than euclidean distance

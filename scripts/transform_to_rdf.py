@@ -9,7 +9,6 @@ from rdflib import Graph
 
 ROOT = Path(__file__).resolve().parents[1]
 VESSELS = ROOT / "clean_data" / "vessels.parquet"
-MAPPINGS = ROOT / "rml"
 
 
 def to_rdf(mapping: str, source: str, table: pd.DataFrame) -> Graph:
@@ -24,6 +23,9 @@ def to_rdf(mapping: str, source: str, table: pd.DataFrame) -> Graph:
         RDF graph of the mapped rows.
     """
     config = f"""
+        [CONFIGURATION]
+        logging_level: WARNING
+
         [DataSource]
         mappings: {(ROOT / "rml" / mapping).as_posix()}
     """
